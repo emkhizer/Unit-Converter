@@ -1,6 +1,7 @@
 import streamlit as st
+import random
 
-# Define a dictionary of unit conversions for each category
+# Define unit conversions 🔄💡
 unit_conversions = {
     "Length": {
         "Meter": 1, "Kilometer": 1000, "Centimeter": 0.01, "Millimeter": 0.001,
@@ -13,39 +14,20 @@ unit_conversions = {
     "Temperature": {
         "Celsius": 1, "Fahrenheit": 1, "Kelvin": 1
     },
-    "Volume": {
-        "Liter": 1, "Milliliter": 0.001, "Gallon": 3.78541, "Quart": 0.946353,
-        "Pint": 0.473176, "Cup": 0.236588, "Fluid Ounce": 0.0295735
+    "Energy": {
+        "Joule": 1, "Calorie": 4.184, "Kilowatt-hour": 3600000, "BTU": 1055.06
     },
-    "Speed": {
-        "Meters/second": 1, "Kilometers/hour": 0.277778, "Miles/hour": 0.44704, "Knot": 0.514444
-    },
-    "Time": {
-        "Second": 1, "Minute": 60, "Hour": 3600, "Day": 86400, "Week": 604800,
-        "Month": 2592000, "Year": 31536000
-    },
-    "Area": {
-        "Square Meter": 1, "Square Kilometer": 1000000, "Square Mile": 2589988.11,
-        "Square Yard": 0.836127, "Square Foot": 0.092903, "Acre": 4046.86, "Hectare": 10000
-    },
-    "Data": {
-        "Bit": 0.125, "Byte": 1, "Kilobyte": 1024, "Megabyte": 1048576,
-        "Gigabyte": 1073741824, "Terabyte": 1099511627776
+    "Pressure": {
+        "Pascal": 1, "Bar": 100000, "PSI": 6894.76, "mmHg": 133.322
     }
 }
 
-def convert_to_base(value, unit, category):
-    """Convert input value to base unit."""
-    conversions = unit_conversions.get(category, {})
-    return value * conversions.get(unit, 1)
-
-def convert_from_base(base_value, unit, category):
-    """Convert base value to target unit."""
-    conversions = unit_conversions.get(category, {})
-    return base_value * (1 / conversions.get(unit, 1))
-
+# Temperature conversion function 🌡️🔥❄️
 def convert_temperature(value, from_unit, to_unit):
-    """Handle temperature conversion separately."""
+    """
+    Yeh function sirf temperature ke liye conversion karta hai. 
+    Agar category temperature nahi hai to yeh function kaam nahi karega.
+    """
     if from_unit == "Celsius" and to_unit == "Fahrenheit":
         return (value * 9/5) + 32
     elif from_unit == "Celsius" and to_unit == "Kelvin":
@@ -60,89 +42,61 @@ def convert_temperature(value, from_unit, to_unit):
         return (value - 273.15) * 9/5 + 32
     return value
 
-# Streamlit app code
-def app():
-    # Add custom CSS for vibrant, modern look
-    st.markdown("""
-        <style>
-            body {
-                background: linear-gradient(45deg, #ff416c, #ff4b2b);
-                font-family: 'Helvetica Neue', sans-serif;
-                color: #fff;
-                padding: 0;
-                margin: 0;
-            }
-            .stButton>button {
-                background-color: #ff416c;
-                color: white;
-                font-size: 18px;
-                font-weight: bold;
-                padding: 12px 24px;
-                border-radius: 8px;
-                border: none;
-                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-                cursor: pointer;
-                transition: background-color 0.3s ease, transform 0.2s ease;
-            }
-            .stButton>button:hover {
-                background-color: #ff4b2b;
-                transform: translateY(-2px);
-            }
-            .stSelectbox>div, .stTextInput>div, .stNumberInput>div {
-                background-color: rgba(255, 255, 255, 0.2);
-                border-radius: 8px;
-                border: none;
-                padding: 10px;
-                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            }
-            .stSelectbox>div:hover, .stTextInput>div:hover, .stNumberInput>div:hover {
-                background-color: rgba(255, 255, 255, 0.3);
-            }
-            h1, h2 {
-                text-align: center;
-                font-weight: 700;
-            }
-            h1 {
-                font-size: 3rem;
-            }
-            h2 {
-                font-size: 1.5rem;
-            }
-            .stTextInput input, .stNumberInput input {
-                background-color: rgba(255, 255, 255, 0.4);
-                border: none;
-                border-radius: 8px;
-                padding: 12px;
-                color: #fff;
-                font-size: 18px;
-            }
-        </style>
-    """, unsafe_allow_html=True)
+# General unit conversion function 🔢🔄
+def convert_unit(value, from_unit, to_unit, category):
+    """
+    Yeh function kisi bhi category ke liye unit convert karega. 
+    Agar category "Temperature" hai to special function call hoga.
+    """
+    if category == "Temperature":
+        return convert_temperature(value, from_unit, to_unit)
+    conversions = unit_conversions.get(category, {})
+    base_value = value * conversions.get(from_unit, 1)
+    return base_value / conversions.get(to_unit, 1)
 
-    st.title("Vibrant Unit Converter")
+# UI Enhancements 🎨✨
+st.set_page_config(page_title="Unit Converter 🔄", page_icon="🛠️", layout="centered")
+st.markdown("""
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        .stButton>button {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 18px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .stButton>button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-    # Category selector
-    category = st.selectbox("Select Conversion Category", 
-                            ["Length", "Mass", "Temperature", "Volume", "Speed", "Time", "Area", "Data"])
+# Title and Stickers 🎉📏
+st.markdown("<h1 style='text-align: center;'>✨ Ultimate Unit Converter 🚀✨</h1>", unsafe_allow_html=True)
+st.image(random.choice(["https://i.imgur.com/6oHf60C.png", "https://i.imgur.com/IljXG6B.png"]), width=150)
 
-    # Select units
-    units = list(unit_conversions.get(category, {}).keys())
-    from_unit = st.selectbox("From Unit", units)
-    to_unit = st.selectbox("To Unit", units)
-    
-    # Input value
-    value = st.number_input("Value to Convert", value=1.0, format="%.6f")
-    
-    if st.button("Convert"):
-        try:
-            if category == "Temperature":
-                result = convert_temperature(value, from_unit, to_unit)
-            else:
-                base_value = convert_to_base(value, from_unit, category)
-                result = convert_from_base(base_value, to_unit, category)
-            st.success(f"Converted Value: {result:.6f} {to_unit}")
-        except Exception as e:
-            st.error(f"Error: {e}")
+# Category Selection 📌
+category = st.selectbox("📂 Select a Category", list(unit_conversions.keys()))
+units = list(unit_conversions[category].keys())
 
-if __name__ == "__main__":
-    app()
+tab1, tab2 = st.columns(2)
+with tab1:
+    from_unit = st.selectbox("🔄 From", units)
+with tab2:
+    to_unit = st.selectbox("➡️ To", units)
+
+# User Input 🔢
+value = st.number_input("💡 Enter Value", value=1.0, format="%.6f")
+
+# Convert Button 🚀
+if st.button("Convert 🔄✨"):
+    try:
+        result = convert_unit(value, from_unit, to_unit, category)
+        st.success(f"✅ {value} {from_unit} = {result:.6f} {to_unit}")
+    except Exception as e:
+        st.error(f"⚠️ Conversion error: {e}")
